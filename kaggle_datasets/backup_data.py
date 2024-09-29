@@ -86,6 +86,12 @@ simple_model.evaluate(val_ds)
 
 simple_model.save("backup_pklot.keras")
 
+pred = simple_model.predict(val_ds)
+pred2 = simple_model.predict(test_ds)
+
+print("predictions (round 1): ", pred)
+print("predictions (round 2): ", pred2)
+
 
 
 
