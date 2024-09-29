@@ -44,6 +44,7 @@ test_ds = tf.keras.utils.image_dataset_from_directory(
 
 
 
+
 AUTOTUNE = tf.data.AUTOTUNE
 
 train_ds = train_ds.cache().shuffle(2000).prefetch(buffer_size=AUTOTUNE)
@@ -80,17 +81,13 @@ simple_model.compile(optimizer=op_1, loss=loss_fxn, metrics=['accuracy'])
 
 epoch = 35
 
-simple_model.fit(train_ds,validation_data=val_ds, epochs=epoch)
+simple_model.fit(train_ds, validation_data=val_ds, epochs=epoch)
 
 simple_model.evaluate(val_ds)
 
 simple_model.save("backup_pklot.keras")
 
 pred = simple_model.predict(val_ds)
-pred2 = simple_model.predict(test_ds)
-
-print("predictions (round 1): ", pred)
-print("predictions (round 2): ", pred2)
 
 
 

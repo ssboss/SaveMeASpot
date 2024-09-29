@@ -2,7 +2,7 @@ import numpy as np
 import os
 import tensorflow as tf
 import tensorflow_datasets as tfds
-from tensorflow.keras.regularizers import L1L2
+from tensorflow.keras.regularizers import l2
 # from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 # input_shape = (100,100,3)
@@ -59,11 +59,12 @@ from tensorflow.keras.regularizers import L1L2
 
 
 batch_size = 256
-img_height = 100
-img_width = 100
+img_height = 180
+img_width = 180
 cwd = os.getcwd()
-data_dir = f'{cwd}/parking-lot-dataset/PKLot/PKLot/PUCPR/'
-data_dir2 = f'{cwd}/parking-lot-dataset-PKLot/PKLot/UFPRO4'
+data_dir = f'{cwd}/parking-lot-dataset/PKLot/PKLotSegmented/PUC/'
+data_dir2 = f'{cwd}/parking-lot-dataset/PKLot/PKLotSegmented/UFPR04/'
+data_dir3 = f'{cwd}/parking-lot-dataset/PKLot/PKLotSegmented/UFPR05'
 
 train_ds = tf.keras.utils.image_dataset_from_directory(
     data_dir,
@@ -84,33 +85,51 @@ val_ds = tf.keras.utils.image_dataset_from_directory(
 )
 
 test_ds = tf.keras.utils.image_dataset_from_directory(
-    data_dir,
+    data_dir2,
+    validation_split=0.5,
+    subset="validation",
+    seed=123,
+    image_size=(img_height, img_width),
+    batch_size=batch_size
 )
 
+# train_ds2 = tf.keras.utils.image_dataset_from_directory(
+#     data_dir3
+# )
 
 
-normalization_layer = tf.keras.layers.Rescaling(1./255)
 
 AUTOTUNE = tf.data.AUTOTUNE
 
-train_ds = train_ds.cache().prefetch(buffer_size=AUTOTUNE)
+train_ds = train_ds.cache().shuffle(2000).prefetch(buffer_size=AUTOTUNE)
 val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
-input_shape = (100,100,3)
+
+input_shape = (180,180,3)
+#input_layer = tf.keras.Input(shape=(180,180,3))
 
 
 
 simple_model = tf.keras.models.Sequential([
-    tf.keras.layers.Flatten(input_shape=input_shape),
-    tf.keras.layers.Dense(units=128, activation="relu", kernel_regularizer=L1L2(l1=0.001,l2=0.001)),
+    tf.keras.layers.Rescaling(1./255, input_shape=input_shape),
+    tf.keras.layers.Conv2D(16 , 3),
+    tf.keras.layers.MaxPooling2D(),
     tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.Dropout(0.2),
-    tf.keras.layers.Dense(units=128, activation="relu", kernel_regularizer=L1L2(l1=0.001,l2=0.001)),
+    tf.keras.layers.Conv2D(32 , 3, activation="relu"),
+    tf.keras.layers.MaxPooling2D(),
     tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.Dropout(0.2),
-    tf.keras.layers.Dense(units=128, activation="relu", kernel_regularizer=L1L2(l1=0.001,l2=0.001)),
+    tf.keras.layers.Conv2D(64 , 3, activation="relu"),
+    tf.keras.layers.MaxPooling2D(),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(units=128, activation="relu"),
     tf.keras.layers.BatchNormalization(),
-    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Dropout(0.5),
+    # tf.keras.layers.Dense(units=128, activation="relu"),
+    # tf.keras.layers.BatchNormalization(),
+    # tf.keras.layers.Dropout(0.5),
+    # tf.keras.layers.Dense(units=128, activation="relu"),
+    # tf.keras.layers.BatchNormalization(),
+    # tf.keras.layers.Dropout(0.5),
     tf.keras.layers.Dense(units=10, activation="softmax")
 ])
 
@@ -124,6 +143,8 @@ epoch = 15
 
 simple_model.fit(train_ds,validation_data=val_ds, epochs=epoch)
 
+simple_model.evaluate(val_ds)
+simple_model.evaluate(test_ds)
 
 
 
