@@ -65,24 +65,29 @@ class ParkingLot:
     
     # check if a location is in a range
     def __inLocation(self, location, lacationRange):
-        return False
-    # checks whether a point is within a quadrilateral space
+        if quad_checker():
 
-def quad_checker(self, coord1, coord2, coord3, coord4, coord5): # kinda cheeks 
-    sum_of_areas = 0
-    quad_area = (coord2[0] - coord1[0]) * (coord3[1] - coord2[1])
-    coords = [coord1, coord2, coord3, coord4, coord5]
-    for i in range(4):
-        if (i+1) < 4:
-            area = 0.5 * (coords[i][0] * (coords[i+1][1]-coords[4][1]) + coords[i+1][0] * (coords[4][1] - coords[i][1]) + coords[4] * (coords[i][1] - coords[i+1][1]))
-        else:
-            area = 0.5 * (coords[i][0] * (coords[i-i][1]-coords[4][1]) + coords[i-i][0] * (coords[4][1] - coords[i][1]) + coords[4] * (coords[i][1] - coords[i-i][1]))
-        sum_of_areas += area
+            return False
     
-    # ending code
-    if sum_of_areas == quad_area:
-        return True
-    return False
+    # checks whether a point is within a quadrilateral space
+    def quad_checker(self, checkCoord, coord1, coord2, coord3, coord4): # kinda cheeks 
+        sum_of_areas = 0
+        quad_area = 1/2 (coord2[0] - coord1[0]) * (coord3[1] - coord2[1])
+        coords = [coord1, coord2, coord3, coord4, checkCoord]
+        for i in range(4):
+            if (i+1) < 4:
+                quad_area += ((coords[i][0] * coords[i+1][1]) - (coords[i+1][1] * coords[i][0]))
+                area = 0.5 * (coords[i][0] * (coords[i+1][1]-coords[4][1]) + coords[i+1][0] * (coords[4][1] - coords[i][1]) + coords[4] * (coords[i][1] - coords[i+1][1]))
+            else:
+                quad_area += (coords[i][0] * coords[i-i][1]) - (coords[i-i][1] * coords[i][0])
+                area = 0.5 * (coords[i][0] * (coords[i-i][1]-coords[4][1]) + coords[i-i][0] * (coords[4][1] - coords[i][1]) + coords[4] * (coords[i][1] - coords[i-i][1]))
+            sum_of_areas += area
+        quad_area /= 2
+        
+        # ending code
+        if sum_of_areas == quad_area:
+            return True
+        return False
         
 
 
